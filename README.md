@@ -211,4 +211,4 @@ Your Name - [LinkedIn](https://www.linkedin.com/in/smahesh9923/)
 
 **Live Demo**: [Your Deployed URL Here]
 
-**GitHub**: https://github.com/YOUR_USERNAME/job_portal
+**GitHub**: https://github.com/Mahesh20s/job-portal-django.git

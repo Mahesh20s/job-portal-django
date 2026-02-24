@@ -205,7 +205,7 @@ For issues or questions, please open an issue on GitHub.
 
 ## Author
 
-Your Name - [LinkedIn](https://linkedin.com/in/yourprofile)
+Your Name - [LinkedIn](https://www.linkedin.com/in/smahesh9923/)
 
 ---
 

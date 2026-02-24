@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Job Portal</title>
+    <link rel="stylesheet" href="{% static 'jobs/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1>Job Portal</h1>
+                <a href="{% url 'jobs:logout' %}" class="btn-nav logout">Logout</a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'jobs:index' %}">← Back to Jobs</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="dashboard-container">
+            <h2>Welcome, {{ user.username }}! 👋</h2>
+
+            <!-- User Stats -->
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-number">{{ user_stats.applications_count }}</div>
+                    <div class="stat-label">Total Applications</div>
+                    <a href="{% url 'jobs:my_applications' %}" class="stat-link">View Details →</a>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ user_stats.bookmarks_count }}</div>
+                    <div class="stat-label">Bookmarked Jobs</div>
+                    <a href="{% url 'jobs:my_bookmarks' %}" class="stat-link">View Details →</a>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">
+                        {% for status in user_stats.applied_jobs %}
+                            {% if status.status == 'Accepted' %}{{ status.count }}{% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="stat-label">Offers Received</div>
+                </div>
+            </section>
+
+            <!-- Application Status Breakdown -->
+            <section class="status-breakdown">
+                <h3>Application Status</h3>
+                <div class="status-list">
+                    {% for status in user_stats.applied_jobs %}
+                    <div class="status-item">
+                        <span>{{ status.status }}: <strong>{{ status.count }}</strong></span>
+                        <div class="status-bar">
+                            <div class="status-fill status-{{ status.status }}" style="width: {% widthratio status.count user_stats.applications_count 100 %}%;" ></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Popular Jobs -->
+            <section class="dashboard-section">
+                <h3>Most Viewed Jobs 🔥</h3>
+                <div class="simple-job-list">
+                    {% for job in popular_jobs %}
+                    <div class="simple-job-card">
+                        <h4><a href="{% url 'jobs:job_detail' job.pk %}">{{ job.title }}</a></h4>
+                        <p class="company">{{ job.company.name }}</p>
+                        <p class="views">👁️ {{ job.views_count }} views</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Recent Jobs -->
+            <section class="dashboard-section">
+                <h3>Recently Posted Jobs 📅</h3>
+                <div class="simple-job-list">
+                    {% for job in recent_jobs %}
+                    <div class="simple-job-card">
+                        <h4><a href="{% url 'jobs:job_detail' job.pk %}">{{ job.title }}</a></h4>
+                        <p class="company">{{ job.company.name }} • {{ job.location }}</p>
+                        <p class="date">Posted: {{ job.posted_date|date:"M d, Y" }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h3>Quick Actions</h3>
+                <div class="action-buttons">
+                    <a href="{% url 'jobs:index' %}" class="btn">Browse All Jobs</a>
+                    <a href="{% url 'jobs:my_applications' %}" class="btn">My Applications</a>
+                    <a href="{% url 'jobs:my_bookmarks' %}" class="btn">My Bookmarks</a>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Job Portal. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="{% static 'jobs/js/script.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for {{ job.title }} - Job Portal</title>
+    <link rel="stylesheet" href="{% static 'jobs/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Job Portal</h1>
+        </header>
+
+        <main class="apply-container">
+            <div class="apply-form">
+                <h2>Apply for {{ job.title }}</h2>
+                <p class="company-name">{{ job.company.name }} • {{ job.location }}</p>
+
+                {% if error %}
+                <div class="alert alert-error">{{ error }}</div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="resume">Upload Your Resume *</label>
+                        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+                        <small>Accepted formats: PDF, DOC, DOCX</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cover_letter">Cover Letter (Optional)</label>
+                        <textarea id="cover_letter" name="cover_letter" rows="6" placeholder="Tell us why you're a great fit for this role..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn">Submit Application</button>
+                    <a href="{% url 'jobs:job_detail' job.pk %}" class="btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Job Portal. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

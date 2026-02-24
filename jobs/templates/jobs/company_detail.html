@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ company.name }} - Job Portal</title>
+    <link rel="stylesheet" href="{% static 'jobs/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1>Job Portal</h1>
+                <div class="auth-buttons">
+                    {% if user.is_authenticated %}
+                        <span>Welcome, {{ user.username }}!</span>
+                        <a href="{% url 'jobs:logout' %}" class="btn-nav logout">Logout</a>
+                    {% else %}
+                        <a href="{% url 'jobs:login' %}" class="btn-nav">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'jobs:index' %}">← Back to Jobs</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="company-detail-container">
+            <div class="company-header">
+                {% if company.logo %}
+                <img src="{{ company.logo }}" alt="{{ company.name }}" class="company-logo-large">
+                {% endif %}
+                <div class="company-info">
+                    <h1>{{ company.name }}</h1>
+                    <div class="company-stats">
+                        <div class="stat">
+                            <strong>{{ total_jobs }}</strong>
+                            <span>Open Positions</span>
+                        </div>
+                        <div class="stat">
+                            <strong>{{ total_applications }}</strong>
+                            <span>Total Applications</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="company-details">
+                <h3>About {{ company.name }}</h3>
+                <p>{{ company.description }}</p>
+
+                {% if company.website %}
+                <p><strong>Website:</strong> <a href="{{ company.website }}" target="_blank">{{ company.website }}</a></p>
+                {% endif %}
+                {% if company.email %}
+                <p><strong>Email:</strong> {{ company.email }}</p>
+                {% endif %}
+                {% if company.phone %}
+                <p><strong>Phone:</strong> {{ company.phone }}</p>
+                {% endif %}
+                {% if company.location %}
+                <p><strong>Location:</strong> {{ company.location }}</p>
+                {% endif %}
+            </div>
+
+            <section id="company-jobs">
+                <h2>Open Positions at {{ company.name }}</h2>
+                <div class="job-listing">
+                    {% for job in jobs %}
+                    <div class="job-card">
+                        <h3><a href="{% url 'jobs:job_detail' job.pk %}">{{ job.title }}</a></h3>
+                        <p class="location">{{ job.location }}</p>
+                        <p class="job-type">{{ job.get_job_type_display }} - {{ job.get_experience_level_display }}</p>
+                        {% if job.salary %}
+                        <p class="salary">{{ job.salary }}</p>
+                        {% endif %}
+                        <p class="description">{{ job.description|truncatewords:30 }}</p>
+                        <a href="{% url 'jobs:job_detail' job.pk %}" class="btn">View Details</a>
+                    </div>
+                    {% empty %}
+                    <p>No open positions at the moment.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if jobs.has_other_pages %}
+                <div class="pagination">
+                    {% if jobs.has_previous %}
+                        <a href="?page=1">« First</a>
+                    {% endif %}
+                    <span>Page {{ jobs.number }} of {{ jobs.paginator.num_pages }}</span>
+                    {% if jobs.has_next %}
+                        <a href="?page={{ jobs.next_page_number }}">Next ›</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Job Portal. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

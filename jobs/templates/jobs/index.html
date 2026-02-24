@@ -1,0 +1,117 @@
+{% extends 'jobs/base.html' %}
+
+{% block title %}Job Portal - Find Your Dream Job{% endblock %}
+
+{% block content %}
+<section id="hero">
+    <h2>Welcome to Job Portal</h2>
+    <p>Find your dream job today!</p>
+    <button class="btn" id="exploreBtn">Explore Jobs</button>
+</section>
+
+<!-- Search & Filter Section -->
+<section id="search-filters">
+    <h3>Search & Filter Jobs</h3>
+    <form method="get" class="search-form">
+        <input type="text" name="search" placeholder="Search by title, company, or location..." value="{{ search_query }}">
+        
+        <select name="job_type">
+            <option value="">All Job Types</option>
+            {% for jt in job_types %}
+                <option value="{{ jt }}" {% if jt == selected_type %}selected{% endif %}>{{ jt }}</option>
+            {% endfor %}
+        </select>
+        
+        <select name="experience">
+            <option value="">All Experience Levels</option>
+            <option value="Entry" {% if 'Entry' == selected_experience %}selected{% endif %}>Entry Level</option>
+            <option value="Mid" {% if 'Mid' == selected_experience %}selected{% endif %}>Mid Level</option>
+            <option value="Senior" {% if 'Senior' == selected_experience %}selected{% endif %}>Senior Level</option>
+            <option value="Executive" {% if 'Executive' == selected_experience %}selected{% endif %}>Executive</option>
+        </select>
+        
+        <select name="location">
+            <option value="">All Locations</option>
+            {% for loc in locations %}
+                <option value="{{ loc }}" {% if loc == selected_location %}selected{% endif %}>{{ loc }}</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit" class="btn-filter">Filter</button>
+    </form>
+</section>
+
+<section id="jobs">
+    <h2>Featured Jobs ({{ jobs.paginator.count }} total)</h2>
+    <div class="job-listing">
+        {% for job in jobs %}
+        <div class="job-card">
+            <div class="job-header">
+                <h3><a href="{% url 'jobs:job_detail' job.pk %}">{{ job.title }}</a></h3>
+                <span class="views-badge">👁️ {{ job.views_count }}</span>
+            </div>
+            <p class="company"><a href="{% url 'jobs:company_detail' job.company.pk %}">{{ job.company.name }}</a></p>
+            <p class="location">📍 {{ job.location }}</p>
+            <p class="job-type">{{ job.get_job_type_display }} - {{ job.get_experience_level_display }}</p>
+            {% if job.salary %}
+            <p class="salary">💰 {{ job.salary }}</p>
+            {% endif %}
+            <p class="description">{{ job.description|truncatewords:30 }}</p>
+            <div class="job-actions">
+                <a href="{% url 'jobs:job_detail' job.pk %}" class="btn-view">View Details</a>
+                {% if user.is_authenticated %}
+                    <button class="btn-bookmark" onclick="toggleBookmark('{{ job.pk }}')">❤️</button>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p style="text-align: center; grid-column: 1 / -1;">No jobs available. Try adjusting your filters.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if jobs.has_other_pages %}
+    <div class="pagination">
+        {% if jobs.has_previous %}
+            <a href="?page=1&{{ request.GET.urlencode }}">« First</a>
+            <a href="?page={{ jobs.previous_page_number }}&{{ request.GET.urlencode }}">‹ Previous</a>
+        {% endif %}
+
+        <span class="page-info">Page {{ jobs.number }} of {{ jobs.paginator.num_pages }}</span>
+
+        {% if jobs.has_next %}
+            <a href="?page={{ jobs.next_page_number }}&{{ request.GET.urlencode }}">Next ›</a>
+            <a href="?page={{ jobs.paginator.num_pages }}&{{ request.GET.urlencode }}">Last »</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+<script>
+    function toggleBookmark(jobId) {
+        fetch(`/job/${jobId}/bookmark/`, {
+            method: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCookie('csrftoken')}
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.is_bookmarked ? 'Job bookmarked!' : 'Bookmark removed!');
+        });
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

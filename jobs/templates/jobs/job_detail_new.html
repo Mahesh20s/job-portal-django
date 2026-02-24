@@ -1,0 +1,137 @@
+{% extends 'jobs/base.html' %}
+
+{% block title %}{{ job.title }} - Job Portal{% endblock %}
+
+{% block content %}
+<div class="job-detail-container">
+    <article class="job-detail">
+        <div class="job-detail-header">
+            <h1>{{ job.title }}</h1>
+            <span class="views-count">👁️ {{ job.views_count }} views</span>
+        </div>
+
+        <div class="company-section">
+            <h3><a href="{% url 'jobs:company_detail' company.pk %}">{{ company.name }}</a></h3>
+            {% if company.logo %}
+                <img src="{{ company.logo }}" alt="{{ company.name }}" class="company-logo">
+            {% endif %}
+        </div>
+
+        <div class="job-meta">
+            <div class="meta-item">
+                <strong>📍 Location:</strong>
+                <span>{{ job.location }}</span>
+            </div>
+            <div class="meta-item">
+                <strong>💼 Job Type:</strong>
+                <span>{{ job.get_job_type_display }}</span>
+            </div>
+            <div class="meta-item">
+                <strong>📊 Experience Level:</strong>
+                <span>{{ job.get_experience_level_display }}</span>
+            </div>
+            {% if job.salary %}
+            <div class="meta-item">
+                <strong>💰 Salary:</strong>
+                <span>{{ job.salary }}</span>
+            </div>
+            {% endif %}
+            {% if job.deadline %}
+            <div class="meta-item">
+                <strong>📅 Application Deadline:</strong>
+                <span>{{ job.deadline }}</span>
+            </div>
+            {% endif %}
+            <div class="meta-item">
+                <strong>📝 Posted:</strong>
+                <span>{{ job.posted_date|date:"M d, Y" }}</span>
+            </div>
+        </div>
+
+        <div class="job-description">
+            <h3>Job Description</h3>
+            {{ job.description|linebreaks }}
+        </div>
+
+        {% if job.requirements %}
+        <div class="job-requirements">
+            <h3>Requirements</h3>
+            {{ job.requirements|linebreaks }}
+        </div>
+        {% endif %}
+
+        <div class="job-company-info">
+            <h3>About {{ company.name }}</h3>
+            <p>{{ company.description }}</p>
+            {% if company.website %}
+                <p><strong>Website:</strong> <a href="{{ company.website }}" target="_blank">{{ company.website }}</a></p>
+            {% endif %}
+            {% if company.email %}
+                <p><strong>Email:</strong> {{ company.email }}</p>
+            {% endif %}
+            {% if company.phone %}
+                <p><strong>Phone:</strong> {{ company.phone }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="job-actions-detail">
+            {% if user.is_authenticated %}
+                {% if has_applied %}
+                    <div class="alert-info">✅ You have already applied for this job</div>
+                {% else %}
+                    <a href="{% url 'jobs:apply_job' job.pk %}" class="btn-apply-now">Apply Now</a>
+                {% endif %}
+                <button class="btn-bookmark-detail" onclick="toggleBookmark('{{ job.pk }}')">
+                    {% if is_bookmarked %}❤️ Bookmarked{% else %}🤍 Bookmark{% endif %}
+                </button>
+            {% else %}
+                <div class="alert-warning">Please <a href="{% url 'jobs:login' %}">login</a> to apply for this job</div>
+            {% endif %}
+        </div>
+    </article>
+
+    <!-- Related Jobs -->
+    {% if related_jobs %}
+    <aside class="related-jobs">
+        <h3>Other Jobs at {{ company.name }}</h3>
+        <div class="jobs-list">
+            {% for related_job in related_jobs %}
+            <div class="related-job-card">
+                <h4><a href="{% url 'jobs:job_detail' related_job.pk %}">{{ related_job.title }}</a></h4>
+                <p>{{ related_job.location }} • {{ related_job.get_job_type_display }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </aside>
+    {% endif %}
+</div>
+
+<script>
+    function toggleBookmark(jobId) {
+        fetch(`/job/${jobId}/bookmark/`, {
+            method: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCookie('csrftoken')}
+        })
+        .then(response => response.json())
+        .then(data => {
+            location.reload();
+        });
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

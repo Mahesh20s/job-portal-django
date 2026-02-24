@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Job Portal - Find Your Dream Job{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'jobs/css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1><a href="{% url 'jobs:index' %}" style="color: white; text-decoration: none;">Job Portal</a></h1>
+                <div class="auth-buttons">
+                    {% if user.is_authenticated %}
+                        <span>Welcome, {{ user.username }}!</span>
+                        {% if user.userprofile and user.userprofile.is_employer %}
+                            <a href="{% url 'jobs:create_job' %}" class="btn-nav" style="background-color: #27ae60;">Post a Job</a>
+                        {% endif %}
+                        <a href="{% url 'jobs:dashboard' %}" class="btn-nav">Dashboard</a>
+                        <a href="{% url 'jobs:logout' %}" class="btn-nav logout">Logout</a>
+                    {% else %}
+                        <a href="{% url 'jobs:login' %}" class="btn-nav">Login</a>
+                        <a href="{% url 'jobs:register' %}" class="btn-nav">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'jobs:index' %}">Home</a></li>
+                    <li><a href="{% url 'jobs:index' %}#jobs">Jobs</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'jobs:my_applications' %}">My Applications</a></li>
+                        <li><a href="{% url 'jobs:my_bookmarks' %}">Bookmarks</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </header>
+
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                        <button type="button" class="close-alert" onclick="this.parentElement.style.display='none';">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Job Portal. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <label class="dark-mode-toggle" style="position: fixed; bottom: 20px; right: 20px; z-index: 100;">
+        <input type="checkbox" id="darkModeToggle">
+        <span>Dark Mode</span>
+    </label>
+
+    <script src="{% static 'jobs/js/script.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

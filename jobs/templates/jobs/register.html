@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Job Portal</title>
+    <link rel="stylesheet" href="{% static 'jobs/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Job Portal</h1>
+        </header>
+
+        <main class="auth-container">
+            <div class="auth-form">
+                <h2>Create Your Account</h2>
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-error">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="error-messages">
+                                {% for error in form.username.errors %}<small>{{ error }}</small>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="error-messages">
+                                {% for error in form.email.errors %}<small>{{ error }}</small>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="error-messages">
+                                {% for error in form.password1.errors %}<small>{{ error }}</small>{% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="help-text">{{ form.password1.help_text|safe }}</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="error-messages">
+                                {% for error in form.password2.errors %}<small>{{ error }}</small>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.is_employer.id_for_label }}">
+                            {{ form.is_employer }}
+                            {{ form.is_employer.label }}
+                        </label>
+                        {% if form.is_employer.errors %}
+                            <div class="error-messages">
+                                {% for error in form.is_employer.errors %}<small>{{ error }}</small>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn">Register</button>
+                </form>
+
+                <p class="auth-link">Already have an account? <a href="{% url 'jobs:login' %}">Login here</a></p>
+                <p class="auth-link"><a href="{% url 'jobs:index' %}">← Back to Jobs</a></p>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Job Portal. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookmarks - Job Portal</title>
+    <link rel="stylesheet" href="{% static 'jobs/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1>Job Portal</h1>
+                <a href="{% url 'jobs:logout' %}" class="btn-nav logout">Logout</a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'jobs:index' %}">← Back to Jobs</a></li>
+                    <li><a href="{% url 'jobs:dashboard' %}">Dashboard</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="dashboard-container">
+            <h2>My Bookmarked Jobs ❤️</h2>
+
+            <div class="bookmarks-list">
+                {% for bookmark in bookmarks %}
+                <div class="bookmark-card">
+                    <h3><a href="{% url 'jobs:job_detail' bookmark.job.pk %}">{{ bookmark.job.title }}</a></h3>
+                    <p class="company"><a href="{% url 'jobs:company_detail' bookmark.job.company.pk %}">{{ bookmark.job.company.name }}</a></p>
+                    <p class="location">{{ bookmark.job.location }}</p>
+                    <p class="job-type">{{ bookmark.job.get_job_type_display }}</p>
+                    {% if bookmark.job.salary %}
+                    <p class="salary">{{ bookmark.job.salary }}</p>
+                    {% endif %}
+                    <p class="bookmarked-date">Saved: {{ bookmark.created_date|date:"M d, Y" }}</p>
+                    <div class="bookmark-actions">
+                        <a href="{% url 'jobs:job_detail' bookmark.job.pk %}" class="btn">View Details</a>
+                        <button onclick="removeBookmark('{{ bookmark.job.pk }}')" class="btn-remove">Remove</button>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="empty-message">You haven't bookmarked any jobs yet. <a href="{% url 'jobs:index' %}">Start exploring</a></p>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if bookmarks.has_other_pages %}
+            <div class="pagination">
+                {% if bookmarks.has_previous %}
+                    <a href="?page=1">« First</a>
+                    <a href="?page={{ bookmarks.previous_page_number }}">‹ Previous</a>
+                {% endif %}
+                <span>Page {{ bookmarks.number }} of {{ bookmarks.paginator.num_pages }}</span>
+                {% if bookmarks.has_next %}
+                    <a href="?page={{ bookmarks.next_page_number }}">Next ›</a>
+                    <a href="?page={{ bookmarks.paginator.num_pages }}">Last »</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Job Portal. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        function removeBookmark(jobId) {
+            fetch(`/job/${jobId}/bookmark/`, {
+                method: 'POST',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>

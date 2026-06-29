@@ -4,6 +4,7 @@ A Django-based job portal web application where employers can post jobs and job 
 
 Link: (https://job-portal-django-e7yz.onrender.com/)
 
+
 Note: The Render takes 1-2min to start website.
 
 ## Features
